@@ -9,7 +9,6 @@ import solid.utils
 import math
 SEGMENTS = 480
 
-
 def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweepAngle,canardWingDihedralAngle,canardWingXPos,canardWingAngleOfAttack,
            mainWingSpan,mainWingTipChord,mainWingRootChord,mainWingSweepAngle,mainWingDihedralAngle,mainWingXPos,mainWingAngleOfAttack,
            miniWingSpan,miniWingTipChord,miniWingRootChord,miniWingSweepAngle,miniWingDihedralAngle,miniWingXPos,miniWingAngleOfAttack,
@@ -127,7 +126,6 @@ def TotalFunc(listE):
     return total
 
     # use as reference
-
 def printDescription(WingDesc):
     print ('aircraftWingSpan'+" "+str(WingDesc['aircraftWingSpan']))
     print ('density'+" "+str(WingDesc['density']))
@@ -351,10 +349,10 @@ if __name__ == '__main__':
     print(WingDesc['miniWingSweepAngle'])
 
 
-    def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweepAngle,canardWingDihedralAngle,canardWingXPos,canardWingAngleOfAttack,
+    a = glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweepAngle,canardWingDihedralAngle,canardWingXPos,canardWingAngleOfAttack,
                mainWingSpan,mainWingTipChord,mainWingRootChord,mainWingSweepAngle,mainWingDihedralAngle,mainWingXPos,mainWingAngleOfAttack,
                miniWingSpan,miniWingTipChord,miniWingRootChord,miniWingSweepAngle,miniWingDihedralAngle,miniWingXPos,miniWingAngleOfAttack,
-               fuselageLength,fuselageWidth):
+               fuselageLength,fuselageWidth)
 
 
     print("%(__file__)s: SCAD file written to: \n%(file_out)s" % vars())
