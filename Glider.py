@@ -12,6 +12,7 @@ SEGMENTS = 480
 
 def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweepAngle,canardWingDihedralAngle,canardWingXPos,canardWingAngleOfAttack,
            mainWingSpan,mainWingTipChord,mainWingRootChord,mainWingSweepAngle,mainWingDihedralAngle,mainWingXPos,mainWingAngleOfAttack,
+           miniWingSpan,miniWingTipChord,miniWingRootChord,miniWingSweepAngle,miniWingDihedralAngle,miniWingXPos,miniWingAngleOfAttack,
            fuselageLength,fuselageWidth):
 
     def generateWing(Span,TipChord,RootChord,SweepAngle,DihedralAngle,flip):
@@ -27,6 +28,18 @@ def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweep
 
     #drawing the fuselage
     final = cube([fuselageLength,fuselageWidth,fuselageWidth])
+
+    miniWings = translate([miniWingXPos,0,0])(
+                     rotate([miniWingAngleOfAttack,0,90])
+                        (
+                        rotate([0,miniWingDihedralAngle,0])
+                            (linear_extrude(1/16,True,0,0)
+                                (generateWing(miniWingSpan,miniWingTipChord,miniWingRootChord,miniWingSweepAngle,miniWingDihedralAngle,False))),
+                        rotate([0,-miniWingDihedralAngle,0])
+                            (linear_extrude(1/16,True,0,0)
+                                (generateWing(miniWingSpan,miniWingTipChord,miniWingRootChord,miniWingSweepAngle,miniWingDihedralAngle,True)))
+                        ))
+
 
     mainWings = translate([mainWingXPos,0,0])(
                      rotate([mainWingAngleOfAttack,0,90])
@@ -47,7 +60,7 @@ def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweep
                             ))
 
     #final = final + mainWings
-    final = final + mainWings + canardWings
+    final = final + mainWings + canardWings + miniWings
     return final
 def area(root,tip,length):
     return(root+tip)*length/2
@@ -116,14 +129,11 @@ def TotalFunc(listE):
     # use as reference
 
 def printDescription(WingDesc):
-    print('Useful aircraft constants')
     print ('aircraftWingSpan'+" "+str(WingDesc['aircraftWingSpan']))
     print ('density'+" "+str(WingDesc['density']))
     print ('velocity'+" "+str(WingDesc['velocity']))
     print ('liftcoefficient'+" "+str(WingDesc['liftcoefficient']))
     print ('dragcoefficient'+" "+str(WingDesc['dragcoefficient']))
-    print('\n')
-
     print ('canardWingSpan'+" "+str(WingDesc['canardWingSpan']))
     print ('canardWingTipChord'+" "+str(WingDesc['canardWingTipChord']))
     print ('canardWingRootChord'+" "+str(WingDesc['canardWingRootChord']))
@@ -131,7 +141,6 @@ def printDescription(WingDesc):
     print ('canardWingDihedralAngle'+" "+str(WingDesc['canardWingDihedralAngle']))
     print ('canardWingYPos'+" "+str(WingDesc['canardWingYPos']))
     print ('canardWingAngleOfAttack'+" "+str(WingDesc['canardWingAngleOfAttack']))
-    print('\n')
     print ('mainWingSpan'+" "+str(WingDesc['mainWingSpan']))
     print ('mainWingTipChord'+" "+str(WingDesc['mainWingTipChord']))
     print ('mainWingRootChord'+" "+str(WingDesc['mainWingRootChord']))
@@ -139,7 +148,6 @@ def printDescription(WingDesc):
     print ('mainWingDihedralAngle'+" "+str(WingDesc['mainWingDihedralAngle']))
     print ('mainWingYPos'+" "+str(WingDesc['mainWingYPos']))
     print ('mainWingAngleOfAttack'+" "+str(WingDesc['mainWingAngleOfAttack']))
-    print('\n')
     print ('miniWingSpan'+" "+str(WingDesc['miniWingSpan']))
     print ('miniWingTipChord'+" "+str(WingDesc['miniWingTipChord']))
     print ('miniWingRootChord'+" "+str(WingDesc['miniWingRootChord']))
@@ -147,7 +155,6 @@ def printDescription(WingDesc):
     print ('miniWingDihedralAngle'+" "+str(WingDesc['miniWingDihedralAngle']))
     print ('miniWingYPos'+" "+str(WingDesc['miniWingYPos']))
     print ('miniWingAngleOfAttack'+" "+str(WingDesc['miniWingAngleOfAttack']))
-    print('\n')
     print ('fuselageLength'+" "+str(WingDesc['fuselageLength']))
     print ('fuselageWidth'+" "+str(WingDesc['fuselageWidth']))
 def derivative(func,listOfVariablesToBeOptimized,i):
@@ -256,10 +263,9 @@ if __name__ == '__main__':
             elif x<0:
                 listOfVariablesToBeOptimized[i] = listOfVariablesToBeOptimized[i] + 0.000001
             listOfVariablesToBeOptimized[19] =  aircraftWingSpan - listOfVariablesToBeOptimized[19-7]
-            if i == 21:
-                listOfVariablesToBeOptimized[13] = listOfVariablesToBeOptimized[21]
             if i == 13:
-                listOfVariablesToBeOptimized[21] = listOfVariablesToBeOptimized[13]            #listOfVariablesToBeOptimized = list(map(lambda x: round(x,3),listOfVariablesToBeOptimized))
+                listOfVariablesToBeOptimized[13] = listOfVariablesToBeOptimized[21]
+            #listOfVariablesToBeOptimized = list(map(lambda x: round(x,3),listOfVariablesToBeOptimized))
         '''
             listOfVariablesToBeOptimized = [
                  aircraftWingSpan,              1
@@ -331,28 +337,24 @@ if __name__ == '__main__':
 
     printDescription(WingDesc)
 
-    print('\n\n\n')
+    print('\n\n\n\n')
     print(WingDesc['canardWingAngleOfAttack'])
     print(WingDesc['mainWingAngleOfAttack'])
     print(WingDesc['miniWingAngleOfAttack'])
-    print('\n\n\n')
+    print('\n\n\n\n')
     print(WingDesc['canardWingDihedralAngle'])
     print(WingDesc['mainWingDihedralAngle'])
     print(WingDesc['miniWingDihedralAngle'])
-    print('\n\n\n')
+    print('\n\n\n\n')
     print(WingDesc['canardWingSweepAngle'])
     print(WingDesc['mainWingSweepAngle'])
     print(WingDesc['miniWingSweepAngle'])
 
-'''
 
-    a = glider(canardWingSpan,canardWingTipChord,canardWingRootChord,
-               canardWingSweepAngle,canardWingDihedralAngle,
-               canardWingXPos,canardWingAngleOfAttack,
-               mainWingSpan,mainWingTipChord,mainWingRootChord,
-               mainWingSweepAngle,mainWingDihedralAngle,
-               mainWingXPos,mainWingAngleOfAttack,
-               fuselageLength,fuselageWidth)
+    def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweepAngle,canardWingDihedralAngle,canardWingXPos,canardWingAngleOfAttack,
+               mainWingSpan,mainWingTipChord,mainWingRootChord,mainWingSweepAngle,mainWingDihedralAngle,mainWingXPos,mainWingAngleOfAttack,
+               miniWingSpan,miniWingTipChord,miniWingRootChord,miniWingSweepAngle,miniWingDihedralAngle,miniWingXPos,miniWingAngleOfAttack,
+               fuselageLength,fuselageWidth):
 
 
     print("%(__file__)s: SCAD file written to: \n%(file_out)s" % vars())
@@ -362,5 +364,3 @@ if __name__ == '__main__':
     # be expensive when making lots of small curves, but is otherwise
     # useful.
     scad_render_to_file(a, file_out, file_header='$fn = %s;' % SEGMENTS)
-
-    '''
