@@ -22,7 +22,7 @@ def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweep
             points=[[0,0],[0+Span,0-Span/math.tan(90-SweepAngle)],[0+Span,0-Span/math.tan(90-SweepAngle)-TipChord],[0,0-RootChord]]
         else:
             points=[[0,0],[0-Span,0-Span/math.tan(90-SweepAngle)],[0-Span,0-Span/math.tan(90-SweepAngle)-TipChord],[0,0-RootChord]]
-
+        print(points)
         return polygon(points)
 
     #drawing the fuselage
@@ -63,9 +63,9 @@ def glider(canardWingSpan,canardWingTipChord,canardWingRootChord,canardWingSweep
     return final
 def area(root,tip,length):
     return(root+tip)*length/2
-def lift(liftcoefficient,density,velocity,area,angleofattack,dihedralangle):
-    return liftcoefficient*density*velocity*velocity*area*math.cos(angleofattack)*math.cos(dihedralangle)/2
-def drag(dragcoefficient,density,velocity,area,angleofattack,dihedralangle):
+def lift(liftcoefficient,density,velocity,area,angleofattack):
+    return liftcoefficient*density*velocity*velocity*area*math.cos(angleofattack)/2
+def drag(dragcoefficient,density,velocity,area,angleofattack):
     return dragcoefficient*density*velocity*velocity*area*math.cos(angleofattack)/2
 def centerY(root,tip,length,sweptangle):
     return root/2 + (length*math.tan(sweptangle) + (tip - root)/2)*(2*tip + root)/(3*(tip+root))
@@ -78,45 +78,43 @@ def stabilityInY(areaTypeOne,areaTypeTwo,areaTypeThree,liftTypeOne,liftTypeTwo,l
     centerOfLift    = (liftTypeOne*(YposOne + centerYOne) + liftTypeTwo*(YposTwo + centerYTwo) + liftTypeThree*(YposThree + centerYThree))/(liftTypeOne+liftTypeTwo+liftTypeThree)
     return centerOfLift - centerOfGravity
 def TotalFunc(listE):
-        # do this stuff now :)
-
     liftWeight = 0.2
     dragWeight = 0.2
-    stabilityWeight = 2
-    YstabilityWeight = 2
+    stabilityWeight = 4
+    YstabilityWeight = 8
     weightWeight = 0.4
     sumLift = 0
     sumdrag = 0
     sumStability = 0
 
-    temp1 =  lift(listE[3],listE[1],listE[2],area(listE[7],listE[6],listE[5]),listE[11],listE[9]) # canardWings
-    sumLift = sumLift + temp1
-    sumStability = sumStability + momentOfForceXTypeOne(temp1,listE[7],listE[6],listE[5])
+    temp1 =  lift(listE[3],listE[1],listE[2],area(listE[7],listE[6],listE[5]),listE[11]) # canardWings
+    sumLift = sumLift + temp1*math.cos(listE[9])
+    sumStability = sumStability + momentOfForceXTypeOne(temp1*math.sin(listE[9]),listE[7],listE[6],listE[5])
 
-    temp2 =  lift(listE[3],listE[1],listE[2],area(listE[7+7],listE[6+7],listE[5+7]),listE[11+7],listE[9+7]) # mainWings
-    sumLift = sumLift + temp2
-    sumStability = sumStability + momentOfForceXTypeOne(temp2,listE[7+7],listE[6+7],listE[5+7])
+    temp2 =  lift(listE[3],listE[1],listE[2],area(listE[7+7],listE[6+7],listE[5+7]),listE[11+7]) # mainWings
+    sumLift = sumLift + temp2*math.cos(listE[9])
+    sumStability = sumStability + momentOfForceXTypeOne(temp2*math.sin(listE[9]),listE[7+7],listE[6+7],listE[5+7])
 
-    temp3 =  lift(listE[3],listE[1],listE[2],area(listE[7+7+7],listE[6+7+7],listE[5+7+7]),listE[11+7+7],listE[9+7+7]) # miniWings
-    sumLift = sumLift + temp3
-    sumStability = sumStability + momentOfForceXTypeTwo(temp3,listE[7+7+7],listE[6+7+7],listE[5+7+7],listE[7+7],listE[6+7],listE[5+7])
+    temp3 =  lift(listE[3],listE[1],listE[2],area(listE[7+7+7],listE[6+7+7],listE[5+7+7]),listE[11+7+7]) # miniWings
+    sumLift = sumLift + temp3*math.cos(listE[9])
+    sumStability = sumStability + momentOfForceXTypeTwo(temp3*math.sin(listE[9]),listE[7+7+7],listE[6+7+7],listE[5+7+7],listE[7+7],listE[6+7],listE[5+7])
 
-    sumdrag = sumdrag + drag(listE[4],listE[1],listE[2],area(listE[7],listE[6],listE[5]),listE[11],listE[9]) # canardWings
-    sumdrag = sumdrag + drag(listE[4],listE[1],listE[2],area(listE[7+7],listE[6+7],listE[5+7]),listE[11+7],listE[9+7]) # mainWings
-    sumdrag = sumdrag + drag(listE[4],listE[1],listE[2],area(listE[7+7+7],listE[6+7+7],listE[5+7+7]),listE[11+7+7],listE[9+7+7]) # miniWings
+    sumdrag = sumdrag + drag(listE[4],listE[1],listE[2],area(listE[7],listE[6],listE[5]),listE[11]) # canardWings
+    sumdrag = sumdrag + drag(listE[4],listE[1],listE[2],area(listE[7+7],listE[6+7],listE[5+7]),listE[11+7]) # mainWings
+    sumdrag = sumdrag + drag(listE[4],listE[1],listE[2],area(listE[7+7+7],listE[6+7+7],listE[5+7+7]),listE[11+7+7]) # miniWings
 
 
     sumLift = sumLift*2
     sumdrag = sumdrag*2
     sumStability = sumStability * 2
-    StabY = stabilityInY(area(listE[7],listE[6],listE[5]),area(listE[7+7],listE[6+7],listE[5+7]),area(listE[7+7+7],listE[6+7+7],listE[5+7+7]),temp1,temp2,temp3,listE[10],listE[10],listE[10],centerY(listE[7],listE[6],listE[5],listE[8]),centerY(listE[7+7],listE[6+7],listE[5+7],listE[8+7]),centerY(listE[7+7+7],listE[6+14],listE[5+14],listE[8+14]))
+    StabY = stabilityInY(area(listE[7],listE[6],listE[5]),area(listE[7+7],listE[6+7],listE[5+7]),area(listE[7+7+7],listE[6+7+7],listE[5+7+7]),temp1*math.cos(listE[9]),temp2*math.cos(listE[9+7]),temp3*math.cos(listE[9+14]),listE[10],listE[10],listE[10],centerY(listE[7],listE[6],listE[5],listE[8]),centerY(listE[7+7],listE[6+7],listE[5+7],listE[8+7]),centerY(listE[7+7+7],listE[6+14],listE[5+14],listE[8+14]))
     weight = (area(listE[7],listE[6],listE[5])+area(listE[7+7],listE[6+7],listE[5+7])+area(listE[7+7+7],listE[6+7+7],listE[5+7+7]))*0.25*2*0.207 + listE[27]*listE[26]*listE[27]*0.207
 
-    total = (liftWeight*sumLift) - (dragWeight*sumdrag) + 0.1*stabilityWeight*sumStability + 0.1*YstabilityWeight*StabY - weight*weightWeight
+    total = (liftWeight*sumLift) - (dragWeight*sumdrag) + stabilityWeight*sumStability+YstabilityWeight*StabY - weight*weightWeight
 
-    if (sumdrag <0):
+    if (sumdrag <=0):
         print("sumdrag is less than zero")
-    if (weight <0):
+    if (weight <=0):
             print("weight is less than zero")
 
 
@@ -160,15 +158,15 @@ def printDescription(WingDesc):
     print('\n\n\n')
     print ('fuselageLength'+" "+str(WingDesc['fuselageLength']))
     print ('fuselageWidth'+" "+str(WingDesc['fuselageWidth']))
-def derivative(func,listOfVariablesToBeOptimized,i):
+def derivative(listOfVariablesToBeOptimized,i):
     oldX = listOfVariablesToBeOptimized
-    Xi = func(oldX)
+    Xi = TotalFunc(oldX)
     newX = listOfVariablesToBeOptimized
 
     deltaX = 0.1
     newX[i] = newX[i]+ deltaX
 
-    Xf = func(newX)
+    Xf = TotalFunc(newX)
 
     newX[i] = newX[i]- deltaX
 
@@ -203,7 +201,7 @@ if __name__ == '__main__':
     canardWingAngleOfAttack = 5 *math.pi/180
     #for Main wing of aircraft
     mainWingSpan = 5
-    mainWingTipChord = 1
+    mainWingTipChord = 1.5
     mainWingRootChord = 2
     mainWingSweepAngle = -10     *math.pi/180
     mainWingDihedralAngle = 10  *math.pi/180
@@ -212,7 +210,7 @@ if __name__ == '__main__':
     #for Mini wing of aircraft.
     miniWingSpan = aircraftWingSpan - mainWingSpan
     miniWingTipChord = 1
-    miniWingRootChord = 2
+    miniWingRootChord = 1.5
     miniWingSweepAngle = -10     *math.pi/180
     miniWingDihedralAngle = 10  *math.pi/180
     miniWingYpos = 3
@@ -256,18 +254,25 @@ if __name__ == '__main__':
     for j in range(numberOfIterations):
     # add stuff to each variable
         for i in range(5,len(listOfVariablesToBeOptimized)-2):
+
             if i in [5]:
                 continue
-            x = derivative(TotalFunc,listOfVariablesToBeOptimized, i)
-            if listOfVariablesToBeOptimized[i] < 0:
-                listOfVariablesToBeOptimized[i] = 0
+
+            x = derivative(listOfVariablesToBeOptimized, i)
             if x > 0:
                 listOfVariablesToBeOptimized[i] = listOfVariablesToBeOptimized[i] + 0.000001
             elif x<0:
                 listOfVariablesToBeOptimized[i] = listOfVariablesToBeOptimized[i] + 0.000001
-            listOfVariablesToBeOptimized[19] =  aircraftWingSpan - listOfVariablesToBeOptimized[19-7]
+
             if i == 13:
-                listOfVariablesToBeOptimized[13] = listOfVariablesToBeOptimized[21]
+                listOfVariablesToBeOptimized[21] = listOfVariablesToBeOptimized[13]
+            if i == 21:
+                    listOfVariablesToBeOptimized[13] = listOfVariablesToBeOptimized[21]
+            if listOfVariablesToBeOptimized[i] < 0:
+                listOfVariablesToBeOptimized[i] = 0
+
+            listOfVariablesToBeOptimized[19] =  aircraftWingSpan - listOfVariablesToBeOptimized[19-7]
+
             #listOfVariablesToBeOptimized = list(map(lambda x: round(x,3),listOfVariablesToBeOptimized))
         '''
             listOfVariablesToBeOptimized = [
