@@ -53,11 +53,11 @@ class wing(object):
         self.rootChord = d["rootChord"]
         self.tipChord = d["tipChord"]
         self.span = d["span"]
-        self.rootAngle = d["rootAngle"]
-        self.tipAngle = d["tipAngle"]
-        self.sweepAngle = d["sweepAngle"]
-        self.dihedralAngle = d["dihedralAngle"]
-        self.attackAngle = d["attackAngle"]
+        self.rootAngle = d["rootAngle"]*math.pi/180
+        self.tipAngle = d["tipAngle"]*math.pi/180
+        self.sweepAngle = d["sweepAngle"]*math.pi/180
+        self.dihedralAngle = d["dihedralAngle"]*math.pi/180
+        self.attackAngle = d["attackAngle"]*math.pi/180
         self.velocity = d["velocity"]
         self.airDensity = d["airDensity"]
         self.pos = d["pos"]
@@ -65,12 +65,15 @@ class wing(object):
         self.point4 = (lambda a,pos: [a[0]+pos[0],a[1]+pos[1],a[2]+pos[2]])(    (lambda a,x,y,z:rotation(a,x,y,z))( (lambda rootChord, rootAngle: [rootChord*math.sin(rootAngle), rootChord*math.cos(rootAngle),0])(self.rootChord, self.tipAngle)                                                                                      ,self.dihedralAngle,self.attackAngle,0),self.pos)
         self.point2 = (lambda a,pos: [a[0]+pos[0],a[1]+pos[1],a[2]+pos[2]])(    (lambda a,x,y,z:rotation(a,x,y,z))( (lambda span, tipChord, tipAngle, attackAngle : [span - tipChord*math.sin(tipAngle),(span - tipChord*math.sin(tipAngle))*math.tan(attackAngle),0])(self.span, self.tipChord, self.tipAngle, self.attackAngle)      ,self.dihedralAngle,self.attackAngle,0),self.pos)
         self.point3 = (lambda a,pos: [a[0]+pos[0],a[1]+pos[1],a[2]+pos[2]])(    (lambda a,x,y,z:rotation(a,x,y,z))( (lambda span, tipChord, tipAngle, attackAngle: [span, tipChord*math.cos(tipAngle)+ (span-tipChord*math.sin(tipAngle))*math.tan(attackAngle),0])(self.span, self.tipChord, self.tipAngle, self.attackAngle)         ,self.dihedralAngle,self.attackAngle,0),self.pos)
+        self.centroid = [(point1[0]+point2[0]+point3[0]+point4[0])/4
         self.area = (lambda point1,point2,point3,point4: 0.5*abs(np.linalg.norm(np.cross([point2[0]-point1[0],point2[1]-point1[1],point2[2]-point1[2]],[point4[0]-point1[0],point4[1]-point1[1],point4[2]-point1[2]]))) + 0.5*abs(np.linalg.norm(np.cross([point3[0]-point1[0],point3[1]-point1[1],point3[2]-point1[2]],[point4[0]-point1[0],point4[1]-point1[1],point4[2]-point1[2]]))))(self.point1,self.point2,self.point3,self.point4)
         self.liftCoefficient = (lambda x: 2*math.pi*x)(self.attackAngle)
         # NOTE: need to correct the conditions if angle of attack exceeds stall angle
-
-        self.lift = (lambda airDensity,velocity,liftCoefficient,area :abs(self.airDensity*np.linalg.norm(self.velocity)*np.linalg.norm(self.velocity)*self.liftCoefficient*self.area/2))(self.airDensity,self.velocity,self.liftCoefficient,self.area)
+        self.dragCoefficient = (lambda x: 1.28*math.sin(x))(self.attackAngle)
+        self.lift = (lambda a,x,y,z:rotation(a,x,y,z))([0,0,(lambda airDensity,velocity,liftCoefficient,area :abs(self.airDensity*np.linalg.norm(self.velocity)*np.linalg.norm(self.velocity)*self.liftCoefficient*self.area/2))(self.airDensity,self.velocity,self.liftCoefficient,self.area)],self.dihedralAngle,self.attackAngle,0)
         # lift is always perpendicular to the wing surface, regardless of other angles.
+        self.drag = (lambda a,x,y,z:rotation(a,x,y,z))([0,(lambda airDensity,velocity,dragCoefficient,area :abs(self.airDensity*np.linalg.norm(self.velocity)*np.linalg.norm(self.velocity)*self.dragCoefficient*self.area/2))(self.airDensity,self.velocity,self.dragCoefficient,self.area),0],self.dihedralAngle,self.attackAngle,0)
+        # drag is always parallel to the wing surface, regardless of other angles.
 
 
 '''
@@ -101,12 +104,13 @@ def main():
     d["sweepAngle"] = 2
     d["dihedralAngle"] = 4
     d["attackAngle"] = 4
-    d["velocity"] = 4
+    d["velocity"] = [0,-4,0]
     d["airDensity"] = 1
     d["pos"]=[0,0,0]
     sample = wing(d)
     print(d["rootChord"])
     print(sample.lift)
+    print(sample.drag)
 
 ###################################################
 # ensuring that everything loads properly
