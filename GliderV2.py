@@ -19,8 +19,8 @@ def multiply(matr_a, matr_b):
         for j, k in product(range(cols), range(rows)):
             rMatrix[idx][j] += matr_a[idx][k] * matr_b[k][j]
     return rMatrix
-def rotation(a,x,y,z):
 
+def point(a,x,y,z,pos):
     X = [ [1,0,0],
           [0,math.cos(x),-math.sin(x)],
           [0,math.sin(x),math.cos(x)]
@@ -40,8 +40,13 @@ def rotation(a,x,y,z):
           [a[2]]
         ]
     ANS = multiply(multiply(Z,Y),multiply(X,A))
-    return [ANS[0][0],ANS[1][0],ANS[2][0]]
-
+    a = [ANS[0][0],ANS[1][0],ANS[2][0]]
+    if len(a)!=len(pos):
+        return None
+    else:
+        for i in range(len(a)):
+            a[i] = a[i] + pos[i]
+        return a
 
 class wing(object):
     def __init__(self,d):
@@ -61,10 +66,22 @@ class wing(object):
         # quantities that modify the input given drasticly
         self.flip = (lambda flip : -1 if True else 1)(d["flip"])
         # all derived quantities
-        self.point1 = (lambda a,pos: [self.flip*(a[0]+pos[0]),a[1]+pos[1],a[2]+pos[2]])(    [0,0,0],self.pos)
-        self.point4 = (lambda a,pos: [self.flip*(a[0]+pos[0]),a[1]+pos[1],a[2]+pos[2]])(    (lambda a,x,y,z:rotation(a,x,y,z))( (lambda rootChord, rootAngle: [rootChord*math.sin(rootAngle), rootChord*math.cos(rootAngle),0])(self.rootChord, self.tipAngle)                                                                                      ,self.dihedralAngle,self.attackAngle,0),self.pos)
-        self.point2 = (lambda a,pos: [self.flip*(a[0]+pos[0]),a[1]+pos[1],a[2]+pos[2]])(    (lambda a,x,y,z:rotation(a,x,y,z))( (lambda span, tipChord, tipAngle, attackAngle: [span - tipChord*math.sin(tipAngle),(span - tipChord*math.sin(tipAngle))*math.tan(attackAngle),0])(self.span, self.tipChord, self.tipAngle, self.attackAngle)      ,self.dihedralAngle,self.attackAngle,0),self.pos)
-        self.point3 = (lambda a,pos: [self.flip*(a[0]+pos[0]),a[1]+pos[1],a[2]+pos[2]])(    (lambda a,x,y,z:rotation(a,x,y,z))( (lambda span, tipChord, tipAngle, attackAngle: [span, tipChord*math.cos(tipAngle)+ (span-tipChord*math.sin(tipAngle))*math.tan(attackAngle),0])(self.span, self.tipChord, self.tipAngle, self.attackAngle)         ,self.dihedralAngle,self.attackAngle,0),self.pos)
+        self.point1 = (lambda a,x,y,z,pos: point(a,x,y,z,pos))(
+                    [0,0,0],
+                    0,self.attackAngle,0,self.pos)
+        """
+        self.point2 = (lambda a,x,y,z,pos: point(a,x,y,z,pos))(
+                    [self.span/math.cos(self.dihedralAngle),self.span*math.tan(self.attackAngle)/math.cos(self.dihedralAngle),0],
+                    0,self.attackAngle,0,self.pos)
+
+        self.point3 = (lambda a,x,y,z,pos: point(a,x,y,z,pos))(
+                    [self.span/math.cos(self.dihedralAngle)-self.tipChord*math.cos(self.tipAngle),self.span*math.tan(self.attackAngle)/math.cos(self.dihedralAngle)+self.tipChord*math.cos(self.tipAngle),0],
+                    0,self.attackAngle,0,self.pos)
+        self.point4 = (lambda a,x,y,z,pos: point(a,x,y,z,pos))(
+                    [self.rootChord*math.sin(self.rootAngle),self.rootChord*math.cos(self.rootAngle),0],
+                    0,self.attackAngle,0,self.pos)
+        """
+
         self.centroid = [(self.point1[0]+self.point2[0]+self.point3[0]+self.point4[0])/4,(self.point1[1]+self.point2[1]+self.point3[1]+self.point4[1])/4,(self.point1[2]+self.point2[2]+self.point3[2]+self.point4[2])/4]
         self.area = (lambda point1,point2,point3,point4: 0.5*abs(np.linalg.norm(np.cross([point2[0]-point1[0],point2[1]-point1[1],point2[2]-point1[2]],[point4[0]-point1[0],point4[1]-point1[1],point4[2]-point1[2]]))) + 0.5*abs(np.linalg.norm(np.cross([point3[0]-point1[0],point3[1]-point1[1],point3[2]-point1[2]],[point4[0]-point1[0],point4[1]-point1[1],point4[2]-point1[2]]))))(self.point1,self.point2,self.point3,self.point4)
         self.liftCoefficient = (lambda x: 2*math.pi*x)(self.attackAngle)
