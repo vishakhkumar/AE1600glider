@@ -36,6 +36,13 @@ def startUpMenu():
 
 
     print('Program: BalsaSimulator')
+
+    print("\n\n\nCreated by Vishakh Pradeep Kumar 2016."+
+    "\nEmail: vkumar@gatech.edu \n\n")
     print(logo)
 
-    subprocess.call(['sleep 5'], shell=True)
+    subprocess.call(['sleep 2'], shell=True)
+
+def endProgram():
+
+    subprocess.call('echo "End of program"', shell=True)
