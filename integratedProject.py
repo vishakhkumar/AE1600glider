@@ -40,64 +40,64 @@ if __name__ == '__main__':
 
     #defining the required values of all wings
     parts = [
-        GliderV2.wing({"rootChord":5,
+        GliderV2.wing({"rootChord":3,
         "tipChord":3,
-        "span":10,
+        "span":8,
         "rootAngle":0,
-        "tipAngle":3,
+        "tipAngle":10,
         "sweepAngle":2,
         "dihedralAngle":10,
         "attackAngle":5,
         "velocity":[0,-4,0],
         "airDensity": 1,
-        "pos":[1,0,0],
+        "pos":[0,0,0],
         "flip":False,
         "thickness":1/16,
         "density":0.5}),
-        GliderV2.wing({"rootChord":5,
+        GliderV2.wing({"rootChord":3,
         "tipChord":3,
-        "span":10,
+        "span":8,
         "rootAngle":0,
-        "tipAngle":3,
+        "tipAngle":0,
         "sweepAngle":2,
         "dihedralAngle":10,
         "attackAngle":5,
         "velocity":[0,-4,0],
         "airDensity": 1,
-        "pos":[1,0,0],
+        "pos":[0,0,0],
         "flip":True,
         "thickness":1/16,
         "density":0.5}),
-        '''
+
         GliderV2.wing({"rootChord":2,
         "tipChord":1,
-        "span":5,
+        "span":3,
         "rootAngle":0,
-        "tipAngle":3,
+        "tipAngle":0,
         "sweepAngle":2,
-        "dihedralAngle":20,
+        "dihedralAngle":10,
         "attackAngle":5,
         "velocity":[0,-4,0],
         "airDensity": 1,
-        "pos":[1,7,0],
+        "pos":[0,7,0],
         "flip":False,
         "thickness":1/16,
         "density":0.5}),
+
         GliderV2.wing({"rootChord":2,
         "tipChord":1,
-        "span":5,
+        "span":3,
         "rootAngle":0,
-        "tipAngle":3,
+        "tipAngle":0,
         "sweepAngle":2,
-        "dihedralAngle":20,
+        "dihedralAngle":10,
         "attackAngle":5,
         "velocity":[0,-4,0],
         "airDensity": 1,
-        "pos":[1,7,0],
+        "pos":[0,7,0],
         "flip":True,
         "thickness":1/16,
         "density":0.5}),
-        '''
 
             ]
 
@@ -114,10 +114,6 @@ if __name__ == '__main__':
 
     scad_render_to_file(final.OpenSCAD_obj, file_out)
     #subprocess.call("/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD "+file_out, shell=True)
-
-    for i in range(noOfIterations):
-        final.update()
-        scad_render_to_file(final.OpenSCAD_obj, file_out)
 
     actualFinal = final.OpenSCAD_obj
     scad_render_to_file(actualFinal, file_out)

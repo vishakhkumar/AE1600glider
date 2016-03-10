@@ -4,9 +4,6 @@ __author__ = 'Vishakh Kumar'
 # Whenever we deal with 3-D values, we will mention it just so that you remember.
 # These values will be numpy.array types.
 
-
-
-
 import collections
 import math
 from math import cos
@@ -113,7 +110,7 @@ class wing(object):
         # try not to mess around with the points. They tend to be finicky.
         self.p1 = ( lambda a,x,y,z,pos:point(a,x,y,z,pos)    )( np.array([self.flip,1,1])*np.array([0,0,0])                                                                                                                                                                   ,0,-self.dihedralAngle,0,   np.array([self.pos[0],self.pos[1],self.pos[2]])           )
         self.p2 = ( lambda a,x,y,z,pos:point(a,x,y,z,pos)    )( np.array([self.flip,1,1])*np.array([self.span/cos(self.dihedralAngle),self.span*tan(self.attackAngle)/cos(self.dihedralAngle),0])                                                                             ,0,-self.dihedralAngle,0,   np.array([self.pos[0],self.pos[1],self.pos[2]])           )
-        self.p3 = ( lambda a,x,y,z,pos:point(a,x,y,z,pos)    )( np.array([self.flip,1,1])*np.array([(self.span/cos(self.dihedralAngle)-self.tipChord*cos(self.tipAngle)),self.span*tan(self.attackAngle)/cos(self.dihedralAngle)+self.tipChord*cos(self.tipAngle),0 ])        ,0,-self.dihedralAngle,0,   np.array([self.pos[0],self.pos[1],self.pos[2]])           )
+        self.p3 = ( lambda a,x,y,z,pos:point(a,x,y,z,pos)    )( np.array([self.flip,1,1])*np.array([(self.span/cos(self.dihedralAngle)),self.span*tan(self.attackAngle)/cos(self.dihedralAngle)+self.tipChord*cos(self.tipAngle),0 ])        ,0,-self.dihedralAngle,0,   np.array([self.pos[0],self.pos[1],self.pos[2]])           )
         self.p4 = ( lambda a,x,y,z,pos:point(a,x,y,z,pos)    )( np.array([self.flip,1,1])*np.array([(self.rootChord*sin(self.rootAngle)),self.rootChord*cos(self.rootAngle),0])                                                                                               ,0,-self.dihedralAngle,0,   np.array([self.pos[0],self.pos[1],self.pos[2]])           )
 
         self.centroid = (lambda x: x)(np.array([   (self.p1[0]+self.p2[0]+self.p3[0]+self.p4[0])/4,    (self.p1[1]+self.p2[1]+self.p3[1]+self.p4[1])/4,    (self.p1[2]+self.p2[2]+self.p3[2]+self.p4[2])/4 ]))
